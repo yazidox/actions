@@ -1,6 +1,5 @@
 import { serve } from '@hono/node-server';
-import donate from './donate/route';
-import jupiterSwap from './jupiter-swap/route';
+
 import pump from './pump/route';
 import { cors } from 'hono/cors';
 import { swaggerUI } from '@hono/swagger-ui';
@@ -11,24 +10,25 @@ const app = new OpenAPIHono();
 app.use('/*', cors());
 
 // Serve static files from the 'public' directory
-app.use('/public/*', serveStatic({
-  root: './public',
-  getContent: async (path, c) => {
-    // Implement your logic to fetch the content
-    // For example, you can use fs.promises.readFile to read the file
-    const fs = require('fs').promises;
-    try {
-      const data = await fs.readFile(path);
-      return new Response(data);
-    } catch (error) {
-      return null;
-    }
-  }
-}));
+app.use(
+  '/public/*',
+  serveStatic({
+    root: './public',
+    getContent: async (path, c) => {
+      // Implement your logic to fetch the content
+      // For example, you can use fs.promises.readFile to read the file
+      const fs = require('fs').promises;
+      try {
+        const data = await fs.readFile(path);
+        return new Response(data);
+      } catch (error) {
+        return null;
+      }
+    },
+  }),
+);
 
 // <--Actions-->
-app.route('/api/donate', donate);
-app.route('/api/jupiter/swap', jupiterSwap);
 app.route('/api/pump', pump);
 // </--Actions-->
 
@@ -47,7 +47,7 @@ app.get(
   }),
 );
 
-const port =  Number(process.env.PORT) || 3000;
+const port = Number(process.env.PORT) || 3000;
 console.log(
   `Server is running on port ${port}
 Visit http://localhost:${port}/swagger-ui to explore existing actions

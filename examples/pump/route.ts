@@ -107,7 +107,7 @@ app.openapi(
           })),
           {
             href: `/api/pump/${mint}/{${amountParameterName}}`,
-            label: 'Donate',
+            label: 'Buy',
             parameters: [
               {
                 name: amountParameterName,
