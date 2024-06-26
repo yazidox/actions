@@ -7,7 +7,9 @@
     "url": "https://github.com/dialectlabs/actions"
   },
   "scripts": {
-    "dev": "tsx watch examples/index.ts"
+    "install": "npm i -g yarn",
+    "dev": "yarn tsx watch examples/index.ts",
+    "start": "yarn tsx watch examples/index.ts"
   },
   "dependencies": {
     "@hono/node-server": "^1.11.3",
@@ -15,11 +17,12 @@
     "@hono/zod-openapi": "^0.14.5",
     "@jup-ag/api": "^6.0.23",
     "@solana/web3.js": "^1.91.8",
-    "hono": "^4.4.7"
+    "hono": "^4.4.7",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^20.11.17",
-    "tsx": "^4.7.1",
-    "prettier": "^3.3.2"
+    "prettier": "^3.3.2",
+    "tsx": "^4.7.1"
   }
 }
