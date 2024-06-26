@@ -103,10 +103,10 @@ app.openapi(
         actions: [
           ...DONATION_AMOUNT_SOL_OPTIONS.map((amount) => ({
             label: `${amount} SOL`,
-            href: `/api/${mint}/${amount}`,
+            href: `/api/pump/${mint}/${amount}`,
           })),
           {
-            href: `/api/${mint}/{${amountParameterName}}`,
+            href: `/api/pump/${mint}/{${amountParameterName}}`,
             label: 'Donate',
             parameters: [
               {
@@ -207,22 +207,6 @@ async function tradeToken(
   } else {
     throw new Error(response.statusText);
   }
-}
-
-async function prepareDonateTransaction(
-  sender: PublicKey,
-  recipient: PublicKey,
-  lamports: number,
-): Promise<VersionedTransaction> {
-  const payer = new PublicKey(sender);
-  const instructions = [
-    SystemProgram.transfer({
-      fromPubkey: payer,
-      toPubkey: new PublicKey(recipient),
-      lamports: lamports,
-    }),
-  ];
-  return prepareTransaction(instructions, payer);
 }
 
 function getDonateInfo(): Pick<
