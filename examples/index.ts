@@ -29,7 +29,7 @@ app.use(
 );
 
 // <--Actions-->
-app.route('/api/pump', pump);
+app.route('/', pump);
 // </--Actions-->
 
 app.doc('/doc', {

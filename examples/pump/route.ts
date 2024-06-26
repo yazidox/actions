@@ -32,34 +32,7 @@ app.openapi(
     responses: actionsSpecOpenApiGetResponse,
   }),
   (c) => {
-    const { icon, title, description } = getDonateInfo();
-    const amountParameterName = 'amount';
-    const response: ActionsSpecGetResponse = {
-      icon,
-      label: `${DEFAULT_DONATION_AMOUNT_SOL} SOL`,
-      title,
-      description,
-      links: {
-        actions: [
-          ...DONATION_AMOUNT_SOL_OPTIONS.map((amount) => ({
-            label: `${amount} SOL`,
-            href: `/api/donate/${amount}`,
-          })),
-          {
-            href: `/api/donate/{${amountParameterName}}`,
-            label: 'Donate',
-            parameters: [
-              {
-                name: amountParameterName,
-                label: 'Enter a custom SOL amount',
-              },
-            ],
-          },
-        ],
-      },
-    };
-
-    return c.json(response, 200);
+    return c.json("Add CA", 200);
   },
 );
 
@@ -103,10 +76,10 @@ app.openapi(
         actions: [
           ...DONATION_AMOUNT_SOL_OPTIONS.map((amount) => ({
             label: `${amount} SOL`,
-            href: `/api/pump/${mint}/${amount}`,
+            href: `/${mint}/${amount}`,
           })),
           {
-            href: `/api/pump/${mint}/{${amountParameterName}}`,
+            href: `/${mint}/{${amountParameterName}}`,
             label: 'Buy',
             parameters: [
               {
