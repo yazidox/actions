@@ -32,7 +32,34 @@ app.openapi(
     responses: actionsSpecOpenApiGetResponse,
   }),
   (c) => {
-    return c.json('Add mint to pump', 200);
+    const { icon, title, description } = getDonateInfo();
+    const amountParameterName = 'amount';
+    const response: ActionsSpecGetResponse = {
+      icon,
+      label: `${DEFAULT_DONATION_AMOUNT_SOL} SOL`,
+      title,
+      description,
+      links: {
+        actions: [
+          ...DONATION_AMOUNT_SOL_OPTIONS.map((amount) => ({
+            label: `${amount} SOL`,
+            href: `/api/donate/${amount}`,
+          })),
+          {
+            href: `/api/donate/{${amountParameterName}}`,
+            label: 'Donate',
+            parameters: [
+              {
+                name: amountParameterName,
+                label: 'Enter a custom SOL amount',
+              },
+            ],
+          },
+        ],
+      },
+    };
+
+    return c.json(response, 200);
   },
 );
 
@@ -40,7 +67,7 @@ app.openapi(
   createRoute({
     method: 'get',
     path: '/{mint}',
-    tags: ['Donate'],
+    tags: ['Pump'],
     request: {
       params: z.object({
         mint: z.string().openapi({
@@ -76,10 +103,10 @@ app.openapi(
         actions: [
           ...DONATION_AMOUNT_SOL_OPTIONS.map((amount) => ({
             label: `${amount} SOL`,
-            href: `/api/donate/${amount}`,
+            href: `/api/${mint}/${amount}`,
           })),
           {
-            href: `/api/donate/{${amountParameterName}}`,
+            href: `/api/${mint}/{${amountParameterName}}`,
             label: 'Donate',
             parameters: [
               {
@@ -99,7 +126,7 @@ app.openapi(
   createRoute({
     method: 'post',
     path: '/{mint}/{amount}',
-    tags: ['Donate'],
+    tags: ['Pump'],
     request: {
       params: z.object({
         mint: z.string().openapi({
@@ -132,30 +159,53 @@ app.openapi(
     const amount =
       c.req.param('amount') ?? DEFAULT_DONATION_AMOUNT_SOL.toString();
     const { account } = (await c.req.json()) as ActionsSpecPostRequestBody;
+    const tx = await tradeToken(mint, 'buy', amount, new PublicKey(account));
 
-    const parsedAmount = parseFloat(amount);
-    const transaction = await prepareDonateTransaction(
-      new PublicKey(account),
-      new PublicKey(DONATION_DESTINATION_WALLET),
-      parsedAmount * LAMPORTS_PER_SOL,
-    );
+    if (!tx) {
+      return c.json({ error: 'Transaction failed' }, 500);
+    }
+    console.log(tx);
+
     const response: ActionsSpecPostResponse = {
-      transaction: Buffer.from(transaction.serialize()).toString('base64'),
+      transaction: Buffer.from(tx.serialize()).toString('base64'),
     };
     return c.json(response, 200);
   },
 );
-function getDonateInfo(): Pick<
-  ActionsSpecGetResponse,
-  'icon' | 'title' | 'description'
-> {
-  const icon =
-    'https://ucarecdn.com/7aa46c85-08a4-4bc7-9376-88ec48bb1f43/-/preview/880x864/-/quality/smart/-/format/auto/';
-  const title = 'Donate to Alice';
-  const description =
-    'Cybersecurity Enthusiast | Support my research with a donation.';
-  return { icon, title, description };
+
+async function tradeToken(
+  mint: string,
+  action: 'buy',
+  amount: number | string,
+  userWallet: PublicKey,
+): Promise<VersionedTransaction | null> {
+  const response = await fetch(`https://pumpportal.fun/api/trade-local`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      publicKey: userWallet, // Your wallet public key
+      action: action, // "buy"
+      mint: mint, // contract address of the token you want to trade
+      denominatedInSol: 'true', // "true" if amount is amount of SOL
+      amount: amount, // amount of SOL
+      slippage: 35, // percent slippage allowed
+      priorityFee: '0.005', // priority fee
+      pool: 'pump', // exchange to trade on. "pump" or "raydium"
+    }),
+  });
+
+  if (response.status === 200) {
+    const data = await response.arrayBuffer();
+    const tx = VersionedTransaction.deserialize(new Uint8Array(data));
+
+    return tx;
+  } else {
+    throw new Error(response.statusText);
+  }
 }
+
 async function prepareDonateTransaction(
   sender: PublicKey,
   recipient: PublicKey,
@@ -170,6 +220,18 @@ async function prepareDonateTransaction(
     }),
   ];
   return prepareTransaction(instructions, payer);
+}
+
+function getDonateInfo(): Pick<
+  ActionsSpecGetResponse,
+  'icon' | 'title' | 'description'
+> {
+  const icon =
+    'https://ucarecdn.com/7aa46c85-08a4-4bc7-9376-88ec48bb1f43/-/preview/880x864/-/quality/smart/-/format/auto/';
+  const title = 'Donate to Alice';
+  const description =
+    'Cybersecurity Enthusiast | Support my research with a donation.';
+  return { icon, title, description };
 }
 
 export default app;
