@@ -1,6 +1,7 @@
 import { serve } from '@hono/node-server';
 import donate from './donate/route';
 import jupiterSwap from './jupiter-swap/route';
+import pump from './pump/route';
 import { cors } from 'hono/cors';
 import { swaggerUI } from '@hono/swagger-ui';
 import { OpenAPIHono } from '@hono/zod-openapi';
@@ -28,6 +29,7 @@ app.use('/public/*', serveStatic({
 // <--Actions-->
 app.route('/api/donate', donate);
 app.route('/api/jupiter/swap', jupiterSwap);
+app.route('/api/pump', pump);
 // </--Actions-->
 
 app.doc('/doc', {
