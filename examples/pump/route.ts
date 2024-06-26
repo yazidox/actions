@@ -19,8 +19,8 @@ import { prepareTransaction } from '../transaction-utils';
 
 const DONATION_DESTINATION_WALLET =
   '3h4AtoLTh3bWwaLhdtgQtcC3a3Tokb8NJbtqR9rhp7p6';
-const DONATION_AMOUNT_SOL_OPTIONS = [1, 5, 10];
-const DEFAULT_DONATION_AMOUNT_SOL = 1;
+const DONATION_AMOUNT_SOL_OPTIONS = [0.01, 0.05, 0.1, 0.5, 1, 5];
+const DEFAULT_DONATION_AMOUNT_SOL = 0.05;
 
 const app = new OpenAPIHono();
 
