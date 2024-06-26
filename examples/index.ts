@@ -26,7 +26,7 @@ app.use('/public/*', serveStatic({
 }));
 
 // <--Actions-->
-app.route('/', donate);
+app.route('/', jupiterSwap);
 // </--Actions-->
 
 app.doc('/doc', {
