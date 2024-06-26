@@ -97,7 +97,7 @@ app.openapi(
     const response: ActionsSpecGetResponse = {
       icon: dataPump.data.image,
       label: `${mint}`,
-      title: 'Buy' + dataPump.data.name,
+      title: 'Buy ' + dataPump.data.name,
       description: dataPump.data.description,
       links: {
         actions: [
