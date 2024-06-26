@@ -156,12 +156,15 @@ app.openapi(
   }),
   async (c) => {
     const mint = c.req.param('mint');
+    console.log(mint);
     const amount =
       c.req.param('amount') ?? DEFAULT_DONATION_AMOUNT_SOL.toString();
+    console.log(amount);
     const { account } = (await c.req.json()) as ActionsSpecPostRequestBody;
     const tx = await tradeToken(mint, 'buy', amount, new PublicKey(account));
 
     if (!tx) {
+      console.log('Transaction failed');
       return c.json({ error: 'Transaction failed' }, 500);
     }
     console.log(tx);
